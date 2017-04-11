@@ -1,13 +1,11 @@
 language: python
 python:
 - 2.7
+- 3.4
+- 3.5
 install:
-- pip install -r requirements.txt
-- pip install .
-- git clone https://github.com/napalm-automation/napalm-base.git napalm-automation/napalm-base
-- cd napalm-automation/napalm-base
-- python setup.py install
-- cd ../..
+- pip install tox-travis
+- pip install coveralls
 
 deploy:
   provider: pypi
@@ -17,26 +15,10 @@ deploy:
   on:
     tags: true
     branch: master
+
 script:
-- cd test/unit
-- nosetests -v TestIOSXRDriver:TestGetterIOSXRDriver.test_get_arp_table
-- nosetests -v TestIOSXRDriver:TestGetterIOSXRDriver.test_get_bgp_config
-- nosetests -v TestIOSXRDriver:TestGetterIOSXRDriver.test_get_bgp_neighbors
-- nosetests -v TestIOSXRDriver:TestGetterIOSXRDriver.test_get_bgp_neighbors_detail
-- nosetests -v TestIOSXRDriver:TestGetterIOSXRDriver.test_get_environment
-- nosetests -v TestIOSXRDriver:TestGetterIOSXRDriver.test_get_facts
-- nosetests -v TestIOSXRDriver:TestGetterIOSXRDriver.test_get_interfaces
-- nosetests -v TestIOSXRDriver:TestGetterIOSXRDriver.test_get_interfaces_counters
-- nosetests -v TestIOSXRDriver:TestGetterIOSXRDriver.test_get_interfaces_ip
-- nosetests -v TestIOSXRDriver:TestGetterIOSXRDriver.test_get_lldp_neighbors
-- nosetests -v TestIOSXRDriver:TestGetterIOSXRDriver.test_get_lldp_neighbors_detail
-- nosetests -v TestIOSXRDriver:TestGetterIOSXRDriver.test_get_mac_address_table
-- nosetests -v TestIOSXRDriver:TestGetterIOSXRDriver.test_get_ntp_stats
-- nosetests -v TestIOSXRDriver:TestGetterIOSXRDriver.test_get_ntp_peers
-- nosetests -v TestIOSXRDriver:TestGetterIOSXRDriver.test_get_route_to
-- nosetests -v TestIOSXRDriver:TestGetterIOSXRDriver.test_get_snmp_information
-- nosetests -v TestIOSXRDriver:TestGetterIOSXRDriver.test_get_probes_config
-- nosetests -v TestIOSXRDriver:TestGetterIOSXRDriver.test_get_probes_results
-- nosetests -v TestIOSXRDriver:TestGetterIOSXRDriver.test_traceroute
-- nosetests -v TestIOSXRDriver:TestGetterIOSXRDriver.test_get_users
-- cd ../..
+- tox
+
+after_success:
+- coveralls
+- if [ $TRAVIS_TAG ]; then curl -X POST https://readthedocs.org/build/napalm; fi
